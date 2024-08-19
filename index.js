@@ -62,6 +62,35 @@ app.post("/api", (req, res) => {
     }
 });
 
+// batch input
+app.post("/api/batch", (req, res) => {
+    res.set('Content-Type', 'application/json'); 
+    
+    const sql = 'INSERT INTO Words(phrase, pronounciation, definition, tags, audioURL) VALUES(?, ?, ?, ?, ?)';
+    const wordsArray = req.body;
+
+    if (!Array.isArray(wordsArray) || wordsArray.length === 0) {
+        return res.status(400).json({ status: 400, message: 'Invalid input, expected an array of words' });
+    }
+
+    const placeholders = wordsArray.map(() => '(?, ?, ?, ?, ?)').join(',');
+    const flattenedValues = wordsArray.reduce((acc, word) => {
+        return acc.concat([word.phrase, word.pronounciation, word.definition, word.tags, word.audioURL]);
+    }, []);
+
+    try {
+        db.run(`INSERT INTO Words(phrase, pronounciation, definition, tags, audioURL) VALUES ${placeholders}`, flattenedValues, function (err) {
+            if (err) {
+                throw err;
+            }
+            res.status(201).json({ status: 201, message: `Batch insert successful, inserted ${this.changes} records.` });
+        });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ status: 500, message: err.message });
+    }
+});
+
 // DELETE API to Remove a Record by ID
 app.delete("/api/:id", (req, res) => {
     const sql = 'DELETE FROM Words WHERE id = ?';
