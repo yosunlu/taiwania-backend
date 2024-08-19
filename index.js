@@ -1,63 +1,93 @@
-import {db} from "./database.js"
+import { db } from "./database.js";
 import express from "express";
-import bodyParser from "body-parser"
+import bodyParser from "body-parser";
+import cors from "cors"; 
 
 const app = express();
-app.use(bodyParser.json())
 
+// Middleware
+app.use(cors()); // Enable CORS
+app.use(bodyParser.json());
+
+// Basic Route for Testing Connection
 app.get('/', (req, res) => {
-    res.status(200);
-    res.send("Connected");
+    res.status(200).send("Connected");
+});
 
-})
-
-app.get("/api", (req,res) => {
-    res.set('content-type', 'application/json');
+// GET API to Fetch All Records
+app.get("/api", (req, res) => {
+    res.set('Content-Type', 'application/json'); 
     const sql = 'SELECT * FROM Words';
-    let data = {phrases: []};
-    try{
+    let data = { phrases: [] };
+
+    try {
         db.all(sql, [], (err, rows) => {
-            if(err) {
+            if (err) {
                 throw err;
             }
             rows.forEach(row => {
-                data.phrases.push({id: row.id, phrase: row.phrase, pronunciation: row.pronunciation, definition: row.definition, tags: row.tags, audioURL: row.audioURL})
-            })
-            let content = JSON.stringify(data);
-            res.send(content);
-        })
-    }catch(err){
-        console.log(err.message);
-        res.status(467);
-        res.send(`{"code":467}, "status:" "${err.message}"`)
+                data.phrases.push({
+                    id: row.id,
+                    phrase: row.phrase,
+                    pronounciation: row.pronounciation,
+                    definition: row.definition,
+                    tags: row.tags,
+                    audioURL: row.audioURL
+                });
+            });
+            res.status(200).json(data);
+        });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ code: 500, status: err.message });
     }
 });
 
-app.post("/api", (req,res) => {
-    res.set('contente-type', 'application/json');
-    const sql = 'INSERT INTO Words(phrase, pronunciation, definition, tags, audioURL) VALUES(?, ?, ?, ?, ?)';
-    let newID;
-    try{
-        db.run(sql, [req.body.phrase, req.body.pronunciation, req.body.definition, req.body.tags, req.body.audioURL], function(err){
-            if(err) throw err;
-        })
-        // newID = this.lastID; 
-        res.status(201); // represents new record created
-        let data = {status: 201, message:`record created`};
-        let content = JSON.stringify(data);
-        res.send(content);
-    }catch(err){
-        console.log(err.message);
-        res.status(468);
-        res.send(`{"code":468}, "status:" "${err.message}"`)
+// POST API to Insert a New Record
+app.post("/api", (req, res) => {
+    res.set('Content-Type', 'application/json'); 
+    const sql = 'INSERT INTO Words(phrase, pronounciation, definition, tags, audioURL) VALUES(?, ?, ?, ?, ?)';
+
+    try {
+        db.run(sql, [req.body.phrase, req.body.pronounciation, req.body.definition, req.body.tags, req.body.audioURL], function (err) {
+            if (err) {
+                throw err;
+            }
+            const newID = this.lastID; 
+            res.status(201).json({ status: 201, message: `Record created with ID ${newID}` });
+        });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ code: 500, status: err.message });
     }
 });
 
-app.delete("/api", (req,res) => {});
+// DELETE API to Remove a Record by ID
+app.delete("/api/:id", (req, res) => {
+    const sql = 'DELETE FROM Words WHERE id = ?';
 
+    try {
+        db.run(sql, req.params.id, function (err) {
+            if (err) {
+                throw err;
+            }
+            if (this.changes === 0) {
+                res.status(404).json({ status: 404, message: "Record not found" });
+            } else {
+                res.status(200).json({ status: 200, message: `Record with ID ${req.params.id} deleted` });
+            }
+        });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ code: 500, status: err.message });
+    }
+});
+
+// Start the Server
 app.listen(4000, (err) => {
-    if(err) {
-        console.log("error", err.message)
+    if (err) {
+        console.error("Error:", err.message);
+    } else {
+        console.log("Listening on port 4000");
     }
-    console.log("Listening on port 4000")
-})
+});

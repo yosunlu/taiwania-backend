@@ -10,12 +10,21 @@ const db = new sql3.Database('./data.db', sqlite3.OPEN_READWRITE, (err) => {
   }
 });
 
-  // Create a new table called "words"
+// Create a new table called "words"
+// db.run(`DROP TABLE IF EXISTS Words`, (err) => {
+//     if (err) {
+//         console.error('Error deleting existing table:', err.message);
+//         return;
+//     }else{
+//         console.error('Table deleted');
+//     }
+// })
+
 db.run(`
 CREATE TABLE IF NOT EXISTS Words (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     phrase TEXT,
-    pronunciation TEXT,
+    pronounciation TEXT,
     definition TEXT,
     tags TEXT,
     audioURL TEXT
@@ -29,44 +38,6 @@ if (err) {
 }
 });
 
-function insertData() {
-    const stmt = db.prepare("INSERT INTO Words (phrase, pronunciation, definition, tags, audioURL) VALUES (?, ?, ?, ?, ?)");
-  
-    stmt.run(
-        '鴨仔聽雷', 
-        'Ah-á thiann luî.', 
-        'Refers to a duck hearing thunder, not knowing what it is. A metaphor for a person who cannot understand the information they receive.', 
-        'slang',
-        'https://sutian.moe.edu.tw/zh-hant/su/27204/'
-    );
-    stmt.run(
-        '愛拚才會贏', 
-        'Ài piànn tsiah ē iânn.', 
-        'Must work hard to win. A metaphor that only through hard work and struggle can one overcome difficulties and achieve success.', 
-        'slang',
-        'https://sutian.moe.edu.tw/zh-hant/su/27204/'
-    );
-    stmt.run(
-        '愛媠毋驚流鼻水', 
-        'Ài-suí m̄ kiann lâu phīnn-tsuí', 
-        'To show off a good figure, even in cold weather, one would rather endure the cold than wear more clothes. Often used to tease women who love beauty, willing to pay the price, no matter the cost.', 
-        'slang',
-        'https://sutian.moe.edu.tw/zh-hant/su/27162/'
-    );
-    stmt.run(
-        '暗頓減食一口，活甲九十九', 
-        'Àm-tǹg kiám tsia̍h tsi̍t kháu, ua̍h kah káu-tsa̍p-káu', 
-        'Eat one less bite at dinner, live to ninety-nine. Indicates that eating a smaller amount at dinner is beneficial to health.', 
-        'slang',
-        'https://sutian.moe.edu.tw/zh-hant/su/27164/'
-    );
-    stmt.run(
-        '水啦', 
-        'Tsúi-lah', 
-        'Means "Awesome!" or "Great!" in English. Used to express approval, admiration, or excitement about something', 
-        'slang',
-        ''
-    );
     
   
 //     stmt.finalize((err) => {
@@ -76,6 +47,5 @@ function insertData() {
 //         console.log('Dummy data inserted successfully.');
 //       }
 //     });
-  }
 
 export {db}
