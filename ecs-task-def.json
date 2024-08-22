@@ -92,10 +92,6 @@
         }
     ],
     "placementConstraints": [],
-    "compatibilities": [
-        "EC2",
-        "FARGATE"
-    ],
     "requiresCompatibilities": [
         "FARGATE"
     ],
@@ -106,6 +102,6 @@
         "operatingSystemFamily": "LINUX"
     },
     "registeredAt": "2024-08-21T09:16:36.903Z",
-    "registeredBy": "arn:aws:iam::891377042101:user/Admin",
-    "tags": []
+    "tags": [],
+    "region": "us-east-1"
 }
