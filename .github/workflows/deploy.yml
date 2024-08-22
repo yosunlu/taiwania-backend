@@ -15,11 +15,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '20'  # Updated to use Node.js 20 to avoid deprecation warnings
 
       - name: Install dependencies
         run: npm install
@@ -30,8 +32,10 @@ jobs:
       - name: Log in to Amazon ECR
         id: ecr-login
         uses: aws-actions/amazon-ecr-login@v1
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}  # Corrected to use environment variables
         with:
-          region: ${{ secrets.AWS_REGION }}
+          skip-logout: true  # Optional: skips logging out after the job completes
 
       - name: Build, tag, and push Docker image
         env:
