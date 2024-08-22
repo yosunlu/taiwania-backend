@@ -1,5 +1,4 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:us-east-1:891377042101:task-definition/taiwania:2",
     "containerDefinitions": [
         {
             "name": "taiwania",
@@ -59,38 +58,8 @@
     "family": "taiwania",
     "executionRoleArn": "arn:aws:iam::891377042101:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
-    "revision": 2,
     "volumes": [],
-    "status": "ACTIVE",
-    "requiresAttributes": [
-        {
-            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
-        },
-        {
-            "name": "ecs.capability.execution-role-awslogs"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.ecr-auth"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.28"
-        },
-        {
-            "name": "ecs.capability.execution-role-ecr-pull"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
-        },
-        {
-            "name": "ecs.capability.task-eni"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
-        }
-    ],
+    
     "placementConstraints": [],
     "requiresCompatibilities": [
         "FARGATE"
@@ -101,7 +70,5 @@
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
-    "registeredAt": "2024-08-21T09:16:36.903Z",
-    "tags": [],
-    "region": "us-east-1"
+    "tags": []
 }
