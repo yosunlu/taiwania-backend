@@ -21,12 +21,6 @@ jobs:
         with:
           node-version: '16'
 
-      - name: Authenticate with PAT
-        env:
-            PAT: ${{ secrets.GH_PAT_WORKFLOW }}
-        run: 
-            git config --global url."https://${PAT}@github.com/".insteadOf "https://github.com/"
-
       - name: Install dependencies
         run: npm install
 
