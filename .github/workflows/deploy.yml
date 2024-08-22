@@ -33,9 +33,12 @@ jobs:
         id: ecr-login
         uses: aws-actions/amazon-ecr-login@v1
         env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}  # Corrected to use environment variables
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
         with:
-          skip-logout: true  # Optional: skips logging out after the job completes
+          skip-logout: true
+
 
       - name: Build, tag, and push Docker image
         env:
