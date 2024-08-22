@@ -55,7 +55,6 @@ jobs:
         with:
             task-definition: ecs-task-def.json
             container-name: ${{ secrets.ECS_CONTAINER_NAME }}
-            region: ${{ secrets.AWS_REGION }}
             image: ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
 
   
