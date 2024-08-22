@@ -19,7 +19,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'  # Updated to use Node.js 20 to avoid deprecation warnings
+          node-version: '20'
 
       - name: Install dependencies
         run: npm install
@@ -37,9 +37,11 @@ jobs:
         with:
           skip-logout: true
 
-
       - name: Build, tag, and push Docker image
         env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
           ECR_REPOSITORY: taiwania
           IMAGE_TAG: ${{ github.sha }}
@@ -49,6 +51,8 @@ jobs:
 
       - name: Update ECS service with new image
         env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
           ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
@@ -56,13 +60,8 @@ jobs:
           ECS_TASK_DEFINITION: ${{ secrets.ECS_TASK_DEFINITION }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          # Create a new task definition JSON file from the template
           TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION)
           NEW_TASK_DEFINITION=$(echo $TASK_DEFINITION | jq --arg IMAGE "$ECR_REGISTRY/taiwania:$IMAGE_TAG" '.taskDefinition.containerDefinitions[0].image=$IMAGE')
           echo $NEW_TASK_DEFINITION > new-task-def.json
-
-          # Register the new task definition
           aws ecs register-task-definition --cli-input-json file://new-task-def.json
-
-          # Update the ECS service with the new task definition
           aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment
