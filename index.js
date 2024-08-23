@@ -14,13 +14,19 @@ app.get('/', (req, res) => {
     res.status(200).send("Connected");
 });
 
-// GET API to Fetch All Records
+// GET API to Fetch All Records with Total Count
 app.get("/api", async (req, res) => {
     res.set('Content-Type', 'application/json'); 
     const sql = 'SELECT * FROM Words';
-    let data = { phrases: [] };
+    const countSql = 'SELECT COUNT(*) FROM Words';
+    let data = { phrases: [], totalCount: 0 };
 
     try {
+        // Fetch the total count
+        const countResult = await db.query(countSql);
+        data.totalCount = parseInt(countResult.rows[0].count, 10);
+
+        // Fetch the phrases
         const result = await db.query(sql);
         result.rows.forEach(row => {
             data.phrases.push({
@@ -32,12 +38,55 @@ app.get("/api", async (req, res) => {
                 audioURL: row.audiourl
             });
         });
+
+        // Send the response
         res.status(200).json(data);
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ code: 500, status: err.message });
     }
 });
+
+
+// GET API to Fetch All Records with page cursor
+app.get("/api/:page", async (req, res) => {
+    res.set('Content-Type', 'application/json'); 
+
+    const page = parseInt(req.params.page, 10); // Convert to integer
+    const offset = (page - 1) * 6;
+
+    const countSql = 'SELECT COUNT(*) FROM Words';
+    const sql = 'SELECT * FROM Words WHERE id > $1 LIMIT 6';
+    const values = [offset];
+    let data = { phrases: [], totalCount: 0 };
+
+    try {
+        // Fetch the total count
+        const countResult = await db.query(countSql);
+        data.totalCount = parseInt(countResult.rows[0].count, 10);
+
+        // Fetch the phrases
+        const result = await db.query(sql, values);
+        result.rows.forEach(row => {
+            data.phrases.push({
+                id: row.id,
+                phrase: row.phrase,
+                pronounciation: row.pronounciation,
+                definition: row.definition,
+                tags: row.tags,
+                audioURL: row.audiourl
+            });
+        });
+
+        // Send the response
+        res.status(200).json(data);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ code: 500, status: err.message });
+    }
+});
+
+
 
 // POST API to Insert a New Record
 app.post("/api", async (req, res) => {
