@@ -53,10 +53,10 @@ app.get("/api/:page", async (req, res) => {
     res.set('Content-Type', 'application/json'); 
 
     const page = parseInt(req.params.page, 10); // Convert to integer
-    const offset = (page - 1) * 6;
+    const offset = (page - 1) * 10;
 
     const countSql = 'SELECT COUNT(*) FROM Words';
-    const sql = 'SELECT * FROM Words WHERE id > $1 LIMIT 6';
+    const sql = 'SELECT * FROM Words WHERE id > $1 LIMIT 10';
     const values = [offset];
     let data = { phrases: [], totalCount: 0 };
 
