@@ -22,9 +22,11 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
+        working-directory: express-backend
         run: npm install
 
       - name: Run tests
+        working-directory: express-backend
         run: npm test
 
       - name: Log in to Amazon ECR
@@ -46,14 +48,14 @@ jobs:
           ECR_REPOSITORY: taiwania
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./express-backend
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
       
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
         with:
-            task-definition: ecs-task-def.json
+            task-definition: express-backend/ecs-task-def.json
             container-name: ${{ secrets.ECS_CONTAINER_NAME }}
             image: ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
         
@@ -71,4 +73,3 @@ jobs:
             service: ${{ secrets.ECS_SERVICE }}
             cluster: ${{ secrets.ECS_CLUSTER }}
             wait-for-service-stability: true
-        
