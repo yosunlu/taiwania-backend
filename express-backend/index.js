@@ -34,7 +34,9 @@ app.get("/api", async (req, res) => {
                 id: row.id,
                 phrase: row.phrase,
                 pronounciation: row.pronounciation,
+                mandarin: row.mandarin,
                 definition: row.definition,
+                usage: row.usage,
                 tags: row.tags,
                 audioURL: row.audiourl
             });
@@ -73,7 +75,9 @@ app.get("/api/:page", async (req, res) => {
                 id: row.id,
                 phrase: row.phrase,
                 pronounciation: row.pronounciation,
+                mandarin: row.mandarin,
                 definition: row.definition,
+                usage: row.usage,
                 tags: row.tags,
                 audioURL: row.audiourl
             });
