@@ -92,6 +92,51 @@ app.get("/api/:page", async (req, res) => {
 });
 
 
+// GET API to Fetch All Records with tag and page cursor
+app.get("/api/:tag/:page", async (req, res) => {
+    res.set('Content-Type', 'application/json'); 
+
+    const page = parseInt(req.params.page, 10); // Convert to integer
+    const tag = req.params.tag; // Extract the tag from the URL parameter
+    const offset = (page - 1) * 10;
+
+    // Update the SQL queries to filter by tag
+    const countSql = 'SELECT COUNT(*) FROM Words WHERE tags @> ARRAY[$1]';
+    const sql = 'SELECT * FROM Words WHERE tags @> ARRAY[$1] ORDER BY id OFFSET $2 LIMIT 10';
+    const countValues = [tag];
+    const sqlValues = [tag, offset];
+
+    let data = { phrases: [], totalCount: 0 };
+
+    try {
+        // Fetch the total count of phrases with the specified tag
+        const countResult = await db.query(countSql, countValues);
+        data.totalCount = parseInt(countResult.rows[0].count, 10);
+
+        // Fetch the phrases with the specified tag, applying pagination
+        const result = await db.query(sql, sqlValues);
+        result.rows.forEach(row => {
+            data.phrases.push({
+                id: row.id,
+                phrase: row.phrase,
+                pronounciation: row.pronounciation,
+                mandarin: row.mandarin,
+                definition: row.definition,
+                usage: row.usage,
+                tags: row.tags,
+                audioURL: row.audiourl
+            });
+        });
+
+        // Send the response
+        res.status(200).json(data);
+    } catch (error) {
+        console.error('Error executing query', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
 
 // POST API to Insert a New Record
 app.post("/api", async (req, res) => {
