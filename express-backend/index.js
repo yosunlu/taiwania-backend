@@ -103,7 +103,7 @@ app.get("/api/:tag/:page", async (req, res) => {
     // Update the SQL queries to filter by tag
     const countSql = 'SELECT COUNT(*) FROM Words WHERE tags @> ARRAY[$1]';
     let sql;
-    if(tag == "proverb" || tag == "EL"){
+    if(tag == "Proverb" || tag == "EL"){
         sql = 'SELECT * FROM Words WHERE usage = $1 ORDER BY id OFFSET $2 LIMIT 10';
     } else {
         sql = 'SELECT * FROM Words WHERE tags @> ARRAY[$1] ORDER BY id OFFSET $2 LIMIT 10';
