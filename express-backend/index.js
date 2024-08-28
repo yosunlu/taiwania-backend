@@ -141,6 +141,61 @@ app.get("/api/:tag/:page", async (req, res) => {
     }
 });
 
+// get API to search for a keyword
+app.get("/search/:keyword", async (req, res) => {
+    res.set('Content-Type', 'application/json'); 
+
+    const keyword = req.params.keyword.trim(); // Extract and trim the search keyword
+    if (!keyword) {
+        return res.status(400).json({ error: "Search keyword cannot be empty" });
+    }
+
+    const searchQuery = `%${keyword}%`; // Prepare the search pattern for SQL
+
+    const sql = `
+        SELECT * FROM Words 
+        WHERE 
+            phrase ILIKE $1 OR
+            pronounciation ILIKE $1 OR
+            mandarin ILIKE $1 OR
+            definition ILIKE $1 OR
+            usage ILIKE $1 OR
+            ARRAY_TO_STRING(tags, ' ') ILIKE $1 OR
+            audioURL ILIKE $1
+        ORDER BY id`;
+
+    const sqlValues = [searchQuery];
+
+    let data = { phrases: [] };
+
+    try {
+        // Execute the SQL query
+        const result = await db.query(sql, sqlValues);
+        result.rows.forEach(row => {
+            data.phrases.push({
+                id: row.id,
+                phrase: row.phrase,
+                pronounciation: row.pronounciation,
+                mandarin: row.mandarin,
+                definition: row.definition,
+                usage: row.usage,
+                tags: row.tags,
+                audioURL: row.audiourl
+            });
+        });
+
+        if (data.phrases.length === 0) {
+            return res.status(404).json({ message: "No matching results found" });
+        }
+
+        res.status(200).json(data);
+
+    } catch (err) {
+        console.error('Error executing search query', err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 
 
 // POST API to Insert a New Record
