@@ -101,12 +101,14 @@ app.get("/api/:tag/:page", async (req, res) => {
     const offset = (page - 1) * 10;
 
     // Update the SQL queries to filter by tag
-    const countSql = 'SELECT COUNT(*) FROM Words WHERE tags @> ARRAY[$1]';
+    let countSql;
     let sql;
     if(tag == "Proverb" || tag == "EL"){
         sql = 'SELECT * FROM Words WHERE usage = $1 ORDER BY id OFFSET $2 LIMIT 10';
+        countSql = 'SELECT COUNT(*) FROM Words WHERE usage = $1';
     } else {
         sql = 'SELECT * FROM Words WHERE tags @> ARRAY[$1] ORDER BY id OFFSET $2 LIMIT 10';
+        countSql = 'SELECT COUNT(*) FROM Words WHERE tags @> ARRAY[$1]'
     }
     const countValues = [tag];
     const sqlValues = [tag, offset];
