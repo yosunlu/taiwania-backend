@@ -1,4 +1,4 @@
-[![image](https://gist.github.com/user-attachments/assets/8e374eb4-232c-470f-ad01-a5efed5fc7da)](https://www.taiwania.co)
+![image](https://github.com/user-attachments/assets/908ca10b-97bd-4455-8add-903e1d38d07c)
 ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
 ![ECR](https://img.shields.io/badge/ECR-%23FF9900.svg?style=for-the-badge&logo=amazon-ecr&logoColor=white)
 ![ECS](https://img.shields.io/badge/ECS-%23FF9900.svg?style=for-the-badge&logo=amazon-ecr&logoColor=white)
@@ -26,9 +26,11 @@
 ## 🚀About
 Taiwania is a Taiwanese dictionary for proverbs and everyday-language usages. Target users are those who wish to learn Taiwanese
 but does not have Mandarin as a second language. Users can search by keyword:
-![image](https://gist.github.com/user-attachments/assets/8e246d26-0b44-466c-80f2-7a7bfad0dfd4) 
+![keyworkd search](https://github.com/user-attachments/assets/04a31bbf-044b-4034-8087-ae476bb0dbc8)
+
 or filter by any of the tag he is interested; in the following case, "praise" is selected:
-![image](https://gist.github.com/user-attachments/assets/53d267d4-8e58-4bdd-bc02-08b1a4f7fd6e)
+![filter search](https://github.com/user-attachments/assets/4fc452cb-42be-4f17-9e7a-32179a259ec3)
+
 
 The data was scrapped from the [official Taiwanese dictionary](https://sutian.moe.edu.tw/zh-hant/) with python's Beautifulsoup and Pandas. The Mandarin 
 and the definition were transalted using LangChain APIs with gpt-4 model. Data is stored in postgreSQL on Amazon's RDS.
