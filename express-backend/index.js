@@ -153,7 +153,6 @@ app.get("/search/:keyword/:page", async (req, res) => {
   }
 
   const searchQuery = `%${keyword}%`; // Prepare the search pattern for SQL
-  
 
   const sql = `
         SELECT * FROM Words 
@@ -169,8 +168,8 @@ app.get("/search/:keyword/:page", async (req, res) => {
         OFFSET $2 
         LIMIT 10;
         `;
-  
-        const countSql= `
+
+  const countSql = `
         SELECT COUNT(*) FROM Words 
         WHERE 
             phrase ILIKE $1 OR
@@ -182,10 +181,9 @@ app.get("/search/:keyword/:page", async (req, res) => {
             audioURL ILIKE $1
         `;
 
-  
   const countValues = [searchQuery];
   const sqlValues = [searchQuery, offset];
-  
+
   let data = { phrases: [], totalCount: 0 };
 
   try {
@@ -218,7 +216,6 @@ app.get("/search/:keyword/:page", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 
 // TODO
 // POST API to Insert a New Record
@@ -253,12 +250,10 @@ app.post("/api/batch", async (req, res) => {
   const wordsArray = req.body;
 
   if (!Array.isArray(wordsArray) || wordsArray.length === 0) {
-    return res
-      .status(400)
-      .json({
-        status: 400,
-        message: "Invalid input, expected an array of words",
-      });
+    return res.status(400).json({
+      status: 400,
+      message: "Invalid input, expected an array of words",
+    });
   }
 
   const values = [];
@@ -285,12 +280,10 @@ app.post("/api/batch", async (req, res) => {
 
   try {
     const result = await db.query(sql, values);
-    res
-      .status(201)
-      .json({
-        status: 201,
-        message: `Batch insert successful, inserted ${result.rowCount} records.`,
-      });
+    res.status(201).json({
+      status: 201,
+      message: `Batch insert successful, inserted ${result.rowCount} records.`,
+    });
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ status: 500, message: err.message });
@@ -308,12 +301,10 @@ app.delete("/api/:id", async (req, res) => {
     if (result.rowCount === 0) {
       res.status(404).json({ status: 404, message: "Record not found" });
     } else {
-      res
-        .status(200)
-        .json({
-          status: 200,
-          message: `Record with ID ${req.params.id} deleted`,
-        });
+      res.status(200).json({
+        status: 200,
+        message: `Record with ID ${req.params.id} deleted`,
+      });
     }
   } catch (err) {
     console.error(err.message);
