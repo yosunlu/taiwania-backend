@@ -106,6 +106,7 @@ docker push <your-aws-account-id>.dkr.ecr.us-east-1.amazonaws.com/taiwania:lates
   - Link the task definition you just created.
   - Ensure that the security group allows all traffic on port 4000.
     - If necessary, create a new security group that permits inbound traffic from 0.0.0.0/0 on port 4000.
+  - NOTE: When re-deploying, the new cluster will provide a public IP address. Use http://[new public adress]:4000/ as the new environment key in vercel's front end deployment.
 4. Service failure troubleshooting (M1/Mac)
   - If the ECS service fails due to an architecture mismatch (e.g., ECS runs on x86 but the image was built on an M1/ARM-based Mac), update the Dockerfile to specify the target architecture:
 dockerfile
