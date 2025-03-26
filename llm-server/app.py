@@ -18,7 +18,7 @@ app = FastAPI(
 
 model=ChatOpenAI(model_name="gpt-4-turbo")
 prompt = ChatPromptTemplate.from_template(
-    "Translate the text to English. This would be used as dictionary. Example translation for \"指鴨子聽到雷聲，並不知道是怎麼回事。比喻一個人對所接收的訊息無法理解。比喻一個人對所接收的訊息無法理解。\" would be \"Refers to a duck hearing thunder, not knowing what it is. A metaphor for a person who cannot understand the information they receive\". {Definition}",
+    "Translate the text to English. Return nothing but the translation. Example translation for \"指鴨子聽到雷聲，並不知道是怎麼回事。比喻一個人對所接收的訊息無法理解。\" would be \"Refers to a duck hearing thunder, not knowing what it is. A metaphor for a person who cannot understand the information they receive.\". {Definition}",
     role="user"
     )
 
