@@ -57,7 +57,7 @@ app.get("/api/:page", async (req, res) => {
   const offset = (page - 1) * 10;
 
   const countSql = "SELECT COUNT(*) FROM Words";
-  const sql = "SELECT * FROM Words WHERE id > $1 LIMIT 10";
+  const sql = "SELECT * FROM Words WHERE id > $1 LIMIT 10"; 
   const values = [offset];
   let data = { phrases: [], totalCount: 0 };
 
@@ -145,7 +145,7 @@ app.get("/api/:tag/:page", async (req, res) => {
 app.get("/search/:keyword/:page", async (req, res) => {
   res.set("Content-Type", "application/json");
 
-  const page = parseInt(req.params.page, 10); // Convert to integer
+  const page = parseInt(req.params.page, 10); // Convert to integer (base 10)
   const keyword = req.params.keyword.trim(); // Extract and trim the search keyword
   const offset = (page - 1) * 10;
   if (!keyword) {
@@ -163,7 +163,6 @@ app.get("/search/:keyword/:page", async (req, res) => {
             definition ILIKE $1 OR
             usage ILIKE $1 OR
             ARRAY_TO_STRING(tags, ' ') ILIKE $1 OR
-            audioURL ILIKE $1
         ORDER BY id
         OFFSET $2 
         LIMIT 10;
