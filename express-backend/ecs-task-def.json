@@ -2,7 +2,7 @@
     "containerDefinitions": [
         {
             "name": "taiwania",
-            "image": "891377042101.dkr.ecr.us-east-1.amazonaws.com/taiwania:latest",
+            "image": "placeholder",
             "cpu": 0,
             "portMappings": [
                 {

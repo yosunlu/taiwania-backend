@@ -17,8 +17,8 @@ app.get("/", (req, res) => {
 // GET API to Fetch All Records with Total Count
 app.get("/api", async (req, res) => {
   res.set("Content-Type", "application/json");
-  const sql = "SELECT * FROM Words";
-  const countSql = "SELECT COUNT(*) FROM Words";
+  const sql = "SELECT * FROM phrases";
+  const countSql = "SELECT COUNT(*) FROM phrases";
   let data = { phrases: [], totalCount: 0 };
 
   try {
@@ -32,7 +32,7 @@ app.get("/api", async (req, res) => {
       data.phrases.push({
         id: row.id,
         phrase: row.phrase,
-        pronounciation: row.pronounciation,
+        pronunciation: row.pronunciation,
         mandarin: row.mandarin,
         definition: row.definition,
         usage: row.usage,
@@ -56,8 +56,8 @@ app.get("/api/:page", async (req, res) => {
   const page = parseInt(req.params.page, 10); // Convert to integer
   const offset = (page - 1) * 10;
 
-  const countSql = "SELECT COUNT(*) FROM Words";
-  const sql = "SELECT * FROM Words WHERE id > $1 LIMIT 10"; 
+  const countSql = "SELECT COUNT(*) FROM phrases";
+  const sql = "SELECT * FROM phrases WHERE id > $1 LIMIT 10"; 
   const values = [offset];
   let data = { phrases: [], totalCount: 0 };
 
@@ -72,7 +72,7 @@ app.get("/api/:page", async (req, res) => {
       data.phrases.push({
         id: row.id,
         phrase: row.phrase,
-        pronounciation: row.pronounciation,
+        pronunciation: row.pronunciation,
         mandarin: row.mandarin,
         definition: row.definition,
         usage: row.usage,
@@ -101,12 +101,12 @@ app.get("/api/:tag/:page", async (req, res) => {
   let countSql;
   let sql;
   if (tag == "Proverb" || tag == "EL") {
-    sql = "SELECT * FROM Words WHERE usage = $1 ORDER BY id OFFSET $2 LIMIT 10";
-    countSql = "SELECT COUNT(*) FROM Words WHERE usage = $1";
+    sql = "SELECT * FROM phrases WHERE usage = $1 ORDER BY id OFFSET $2 LIMIT 10";
+    countSql = "SELECT COUNT(*) FROM phrases WHERE usage = $1";
   } else {
     sql =
-      "SELECT * FROM Words WHERE tags @> ARRAY[$1] ORDER BY id OFFSET $2 LIMIT 10";
-    countSql = "SELECT COUNT(*) FROM Words WHERE tags @> ARRAY[$1]";
+      "SELECT * FROM phrases WHERE tags @> ARRAY[$1] ORDER BY id OFFSET $2 LIMIT 10";
+    countSql = "SELECT COUNT(*) FROM phrases WHERE tags @> ARRAY[$1]";
   }
   const countValues = [tag];
   const sqlValues = [tag, offset];
@@ -124,7 +124,7 @@ app.get("/api/:tag/:page", async (req, res) => {
       data.phrases.push({
         id: row.id,
         phrase: row.phrase,
-        pronounciation: row.pronounciation,
+        pronunciation: row.pronunciation,
         mandarin: row.mandarin,
         definition: row.definition,
         usage: row.usage,
@@ -155,24 +155,24 @@ app.get("/search/:keyword/:page", async (req, res) => {
   const searchQuery = `%${keyword}%`; // Prepare the search pattern for SQL
 
   const sql = `
-        SELECT * FROM Words 
+        SELECT * FROM phrases 
         WHERE 
             phrase ILIKE $1 OR
-            pronounciation ILIKE $1 OR
+            pronunciation ILIKE $1 OR
             mandarin ILIKE $1 OR
             definition ILIKE $1 OR
             usage ILIKE $1 OR
-            ARRAY_TO_STRING(tags, ' ') ILIKE $1 OR
+            ARRAY_TO_STRING(tags, ' ') ILIKE $1
         ORDER BY id
         OFFSET $2 
         LIMIT 10;
         `;
 
   const countSql = `
-        SELECT COUNT(*) FROM Words 
+        SELECT COUNT(*) FROM phrases 
         WHERE 
             phrase ILIKE $1 OR
-            pronounciation ILIKE $1 OR
+            pronunciation ILIKE $1 OR
             mandarin ILIKE $1 OR
             definition ILIKE $1 OR
             usage ILIKE $1 OR
@@ -180,8 +180,8 @@ app.get("/search/:keyword/:page", async (req, res) => {
             audioURL ILIKE $1
         `;
 
-  const countValues = [searchQuery];
-  const sqlValues = [searchQuery, offset];
+  const countValues = [searchQuery]; // parameters for the countSql query
+  const sqlValues = [searchQuery, offset]; // parameters for the sql query
 
   let data = { phrases: [], totalCount: 0 };
 
@@ -196,7 +196,7 @@ app.get("/search/:keyword/:page", async (req, res) => {
       data.phrases.push({
         id: row.id,
         phrase: row.phrase,
-        pronounciation: row.pronounciation,
+        pronunciation: row.pronunciation,
         mandarin: row.mandarin,
         definition: row.definition,
         usage: row.usage,
@@ -221,12 +221,12 @@ app.get("/search/:keyword/:page", async (req, res) => {
 app.post("/api", async (req, res) => {
   res.set("Content-Type", "application/json");
   const sql =
-    "INSERT INTO Words(phrase, pronounciation, definition, tags, audioURL) VALUES($1, $2, $3, $4, $5) RETURNING id";
+    "INSERT INTO phrases(phrase, pronunciation, definition, tags, audioURL) VALUES($1, $2, $3, $4, $5) RETURNING id";
 
   try {
     const result = await db.query(sql, [
       req.body.phrase,
-      req.body.pronounciation,
+      req.body.pronunciation,
       req.body.definition,
       req.body.tags,
       req.body.audioURL,
@@ -251,7 +251,7 @@ app.post("/api/batch", async (req, res) => {
   if (!Array.isArray(wordsArray) || wordsArray.length === 0) {
     return res.status(400).json({
       status: 400,
-      message: "Invalid input, expected an array of words",
+      message: "Invalid input, expected an array of phrases",
     });
   }
 
@@ -268,14 +268,14 @@ app.post("/api/batch", async (req, res) => {
   wordsArray.forEach((word) => {
     values.push(
       word.phrase,
-      word.pronounciation,
+      word.pronunciation,
       word.definition,
       word.tags,
       word.audioURL
     );
   });
 
-  const sql = `INSERT INTO Words(phrase, pronounciation, definition, tags, audioURL) VALUES ${placeholders}`;
+  const sql = `INSERT INTO phrases(phrase, pronunciation, definition, tags, audioURL) VALUES ${placeholders}`;
 
   try {
     const result = await db.query(sql, values);
@@ -293,7 +293,7 @@ app.post("/api/batch", async (req, res) => {
 // DELETE API to Remove a Record by ID
 
 app.delete("/api/:id", async (req, res) => {
-  const sql = "DELETE FROM Words WHERE id = $1";
+  const sql = "DELETE FROM phrases WHERE id = $1";
 
   try {
     const result = await db.query(sql, [req.params.id]);

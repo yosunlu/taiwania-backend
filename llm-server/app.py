@@ -16,7 +16,7 @@ app = FastAPI(
 )
 
 
-model=ChatOpenAI(model_name="gpt-4-turbo")
+model = ChatOpenAI(model_name="gpt-4-turbo")
 prompt = ChatPromptTemplate.from_template(
     "Translate the text to English. Return nothing but the translation. Example translation for \"指鴨子聽到雷聲，並不知道是怎麼回事。比喻一個人對所接收的訊息無法理解。\" would be \"Refers to a duck hearing thunder, not knowing what it is. A metaphor for a person who cannot understand the information they receive.\". {Definition}",
     role="user"
@@ -42,9 +42,17 @@ prompt2 = ChatPromptTemplate.from_template(
 # route to translate a phrase's English definition to Mandarin
 add_routes(
     app,
-    prompt|model,
-    path="/translate"
+    prompt|model, # 把 prompt 和 model 組成一個「chain」
+    path="/translate" # 自動將這個 chain 註冊成 FastAPI 的一條 POST 路由 /translate
 )
+# 底層：
+# @app.post("/translate")
+# async def translate_endpoint(input: dict):
+#     try:
+#         chain_result = await chain.ainvoke(input)
+#         return {"result": chain_result}
+#     except Exception as e:
+#         return {"error": str(e)}
 
 # route to categorize/tag a phrase
 add_routes(
